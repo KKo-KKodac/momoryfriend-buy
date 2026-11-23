@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>관리자 페이지 | 주식회사 메모리친구</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background: #f1f5f9; color: #1e293b; padding: 20px; }
+    .container { max-width: 1050px; margin: 0 auto; }
+
+    .login-card { max-width: 360px; margin: 100px auto; background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); text-align: center; }
+    .login-card h2 { margin-bottom: 16px; }
+    .input { width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; }
+    .btn { padding: 10px 16px; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; }
+    .btn-primary { background: #1e40af; color: #fff; }
+    .btn-success { background: #15803d; color: #fff; }
+    .btn-danger { background: #dc2626; color: #fff; }
+    .btn-gray { background: #e2e8f0; color: #334155; }
+
+    .tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+    .tab-btn { padding: 10px 18px; border-radius: 8px; border: 1px solid #cbd5e1; background: #fff; font-weight: 700; cursor: pointer; }
+    .tab-btn.active { background: #1e40af; color: #fff; border-color: #1e40af; }
+
+    .panel { display: none; background: #fff; padding: 24px; border-radius: 12px; border: 1px solid #e2e8f0; }
+    .panel.active { display: block; }
+    .form-row { display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; align-items: center; }
+    .preview-img { width: 100%; max-height: 240px; object-fit: cover; border-radius: 8px; margin-top: 10px; border: 1px solid #e2e8f0; }
+
+    .import-box { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 10px; padding: 18px; margin-bottom: 24px; }
+    .import-box h4 { color: #1e40af; margin-bottom: 6px; font-size: 16px; }
+
+    table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 14px; }
+    th, td { padding: 10px 12px; border-bottom: 1px solid #e2e8f0; text-align: left; }
+    th { background: #f8fafc; }
+
+    .post-detail-card { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 16px; margin-top: 16px; }
+  </style>
+</head>
+<body>
+
+  <!-- 관리자 로그인 -->
+  <div id="loginBox" class="login-card">
+    <h2>🔒 관리자 인증</h2>
+    <input type="password" id="adminPw" class="input" style="text-align:center; margin-bottom:12px;" placeholder="관리자 비밀번호" onkeyup="if(event.key==='Enter') adminLogin()">
+    <button class="btn btn-primary" style="width:100%;" onclick="adminLogin()">로그인</button>
+  </div>
+
+  <!-- 관리자 대시보드 -->
+  <div id="adminPanel" class="container" style="display:none;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+      <h2>⚙️ 주식회사 메모리친구 관리자</h2>
+      <button class="btn btn-gray" onclick="loadAdminData()">🔄 새로고침</button>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('banner', this)">1. 메인 이미지 관리</button>
+      <button class="tab-btn" onclick="switchTab('prices', this)">2. 매입단가 관리</button>
+      <button class="tab-btn" onclick="switchTab('board', this)">3. 게시판 관리</button>
+    </div>
+
+    <!-- 1. 메인 이미지 관리 -->
+    <div id="tab-banner" class="panel active">
+      <h3 style="margin-bottom:16px;">메인페이지 배너 이미지 및 문구 설정</h3>
+      <div style="margin-bottom:12px;">
+        <label style="font-size:13px; font-weight:700;">배경 이미지 URL (또는 로컬 파일 업로드 시 자동 변환)</label>
+        <input type="text" id="cfgImgUrl" class="input" style="margin-top:4px;" oninput="document.getElementById('imgPreview').src=this.value">
+        <input type="file" accept="image/*" style="margin-top:8px; font-size:13px;" onchange="handleImageUpload(this)">
+      </div>
+      <div style="margin-bottom:12px;">
+        <label style="font-size:13px; font-weight:700;">메인 타이틀 문구</label>
+        <input type="text" id="cfgTitle" class="input" style="margin-top:4px;">
+      </div>
+      <div style="margin-bottom:14px;">
+        <label style="font-size:13px; font-weight:700;">서브 설명 문구</label>
+        <input type="text" id="cfgSub" class="input" style="margin-top:4px;">
+      </div>
+      <button class="btn btn-primary" onclick="saveBannerConfig()">💾 메인 설정 저장하기</button>
+      <img id="imgPreview" class="preview-img" src="">
+    </div>
+
+    <!-- 2. 매입단가 관리 -->
+    <div id="tab-prices" class="panel">
+      <!-- 구글 시트 탭 URL 수동 불러오기 -->
+      <div class="import-box">
+        <h4>📥 구글 시트 탭 URL로 단가 불러오기 (수동 갱신)</h4>
+        <p style="font-size:13px; color:#475569; margin-bottom:10px;">
+          양식(<code>A:TAB-1 / B:TAB-2 / C:TAB-3 / D:분류 / E:상품 / F:단가</code>)에 맞춘 각 시트 탭의 주소를 한 줄에 하나씩 입력하세요. 불러오기 실행 시 URL 목록이 자동 저장됩니다.
+        </p>
+        <textarea id="sheetUrlsInput" class="input" rows="4" style="margin-bottom:10px;" placeholder="https://docs.google.com/spreadsheets/d/xxxx/edit#gid=0&#10;https://docs.google.com/spreadsheets/d/xxxx/edit#gid=12345678"></textarea>
+
+        <div class="form-row" style="margin-bottom:0;">
+          <select id="importMode" class="input" style="width:auto;">
+            <option value="replace">기존 단가 전체 교체 (덮어쓰기)</option>
+            <option value="append">기존 단가 아래에 추가하기</option>
+          </select>
+          <button id="btnImport" class="btn btn-success" onclick="importFromSheetUrls()">🚀 시트 단가 불러오기</button>
+        </div>
+      </div>
+
+      <!-- 개별 추가 / 수정 -->
+      <h3 style="margin-bottom:12px;">개별 매입단가 직접 등록 / 수정</h3>
+      <input type="hidden" id="editPriceId">
+      <div class="form-row">
+        <input type="text" id="pCat" class="input" style="flex:1; min-width:100px;" placeholder="분류 (예: CPU)">
+        <input type="text" id="pName" class="input" style="flex:2.5; min-width:180px;" placeholder="상품명">
+        <input type="number" id="pVal" class="input" style="flex:1; min-width:110px;" placeholder="단가(원)">
+        <input type="text" id="pNote" class="input" style="flex:1.8; min-width:150px;" placeholder="세부분류 / 비고">
+        <button class="btn btn-primary" onclick="savePriceItem()">저장</button>
+        <button class="btn btn-gray" onclick="clearPriceForm()">초기화</button>
+      </div>
+
+      <!-- 관리자 목록 검색/필터 -->
+      <div class="form-row" style="margin-top:20px; padding-top:16px; border-top:1px solid #e2e8f0;">
+        <select id="adminCatFilter" class="input" style="width:150px;" onchange="renderAdminPrices()">
+          <option value="전체">전체 분류</option>
+        </select>
+        <input type="text" id="adminPriceSearch" class="input" style="flex:1; min-width:180px;" placeholder="등록된 품목 검색 (수정/삭제할 모델명 입력)..." onkeyup="renderAdminPrices()">
+        <span style="font-size:13px; color:#64748b;">총 <strong id="priceCount">0</strong>개</span>
+      </div>
+
+      <div style="overflow-x:auto; max-height:520px; overflow-y:auto;">
+        <table>
+          <thead>
+            <tr><th>분류</th><th>상품명</th><th>단가</th><th>비고</th><th style="width:130px;">관리</th></tr>
+          </thead>
+          <tbody id="adminPriceBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 3. 게시판 관리 -->
+    <div id="tab-board" class="panel">
+      <h3 style="margin-bottom:14px;">매입문의 게시판 관리 (비밀글 열람 및 답변)</h3>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr><th>방식</th><th>제목</th><th>작성자</th><th>작성일</th><th>상태</th><th>관리</th></tr>
+          </thead>
+          <tbody id="adminBoardBody"></tbody>
+        </table>
+      </div>
+
+      <div id="adminPostViewer" class="post-detail-card" style="display:none;">
+        <h4 id="apTitle" style="margin-bottom:6px;"></h4>
+        <div id="apMeta" style="font-size:13px; color:#64748b; margin-bottom:10px;"></div>
+        <div id="apContent" style="background:#fff; padding:12px; border-radius:6px; white-space:pre-wrap; font-size:14px; margin-bottom:12px;"></div>
+        <label style="font-size:13px; font-weight:700;">관리자 답변 작성</label>
+        <textarea id="apReplyInput" class="input" rows="3" style="margin:6px 0 10px;" placeholder="고객에게 안내할 견적 및 진행 안내를 입력하세요."></textarea>
+        <div style="display:flex; gap:8px;">
+          <button class="btn btn-primary" onclick="saveAdminReply()">💬 답변 등록/수정</button>
+          <button class="btn btn-danger" onclick="deleteAdminPost()">🗑️ 게시글 삭제</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  const API_URL = "https://script.google.com/macros/s/AKfycbyr8PsSRiv5XBvcxMsyvVvxGmPoe2fnQccgRcFXGgysB2Pb7ijSJHzKuPKMHa7XzyVH/exec";
+
+  let savedPw = "";
+  let pricesCache = [];
+  let selectedPostId = null;
+
+  async function adminLogin() {
+    const pw = document.getElementById('adminPw').value.trim();
+    if (!pw) return alert("비밀번호를 입력하세요.");
+    const res = await fetch(`${API_URL}?action=checkAdmin&pw=${encodeURIComponent(pw)}`);
+    const data = await res.json();
+    if (data.status === "success") {
+      savedPw = pw;
+      document.getElementById('loginBox').style.display = 'none';
+      document.getElementById('adminPanel').style.display = 'block';
+      loadAdminData();
+    } else {
+      alert("비밀번호가 일치하지 않습니다.");
+    }
+  }
+
+  function switchTab(name, btn) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  async function loadAdminData() {
+    const res = await fetch(`${API_URL}?action=getAll`);
+    const data = await res.json();
+    if (data.status !== "success") return;
+
+    // 1. 배너 및 저장된 시트 URL 채우기
+    document.getElementById('cfgImgUrl').value = data.config.mainImage || "";
+    document.getElementById('imgPreview').src = data.config.mainImage || "";
+    document.getElementById('cfgTitle').value = data.config.mainTitle || "";
+    document.getElementById('cfgSub').value = data.config.mainSub || "";
+    document.getElementById('sheetUrlsInput').value = data.config.sheetUrls || "";
+
+    // 2. 단가 목록 및 분류 필터 세팅
+    pricesCache = data.prices || [];
+    const cats = [...new Set(pricesCache.map(p => p.category))].filter(Boolean);
+    const catSel = document.getElementById('adminCatFilter');
+    catSel.innerHTML = '<option value="전체">전체 분류</option>';
+    cats.forEach(c => {
+      const opt = document.createElement('option');
+      opt.value = c; opt.innerText = c;
+      catSel.appendChild(opt);
+    });
+    renderAdminPrices();
+
+    // 3. 게시판 목록
+    document.getElementById('adminBoardBody').innerHTML = (data.posts || []).map(p => `
+      <tr>
+        <td>${p.method}</td>
+        <td>${p.title}</td>
+        <td>${p.author}</td>
+        <td>${p.createdAt}</td>
+        <td>${p.hasReply ? '<span style="color:#15803d; font-weight:700;">답변완료</span>' : '<span style="color:#b45309;">대기중</span>'}</td>
+        <td><button class="btn btn-primary" style="padding:5px 10px; font-size:12px;" onclick="openAdminPost('${p.id}')">열람/답변</button></td>
+      </tr>
+    `).join('');
+  }
+
+  function renderAdminPrices() {
+    const cat = document.getElementById('adminCatFilter').value;
+    const q = document.getElementById('adminPriceSearch').value.toLowerCase();
+    const filtered = pricesCache.filter(p =>
+      (cat === "전체" || p.category === cat) &&
+      (p.name.toLowerCase().includes(q) || (p.note || "").toLowerCase().includes(q))
+    );
+
+    document.getElementById('priceCount').innerText = filtered.length;
+    document.getElementById('adminPriceBody').innerHTML = filtered.map(p => `
+      <tr>
+        <td>${p.category}</td>
+        <td><strong>${p.name}</strong></td>
+        <td>${Number(p.price).toLocaleString()}원</td>
+        <td>${p.note || '-'}</td>
+        <td>
+          <button class="btn btn-gray" style="padding:5px 9px; font-size:12px;" onclick="editPrice('${p.id}')">수정</button>
+          <button class="btn btn-danger" style="padding:5px 9px; font-size:12px;" onclick="deletePrice('${p.id}')">삭제</button>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  // 구글 시트 각 탭 URL에서 단가 수동 일괄 가져오기
+  async function importFromSheetUrls() {
+    const rawUrlsText = document.getElementById('sheetUrlsInput').value.trim();
+    if (!rawUrlsText) return alert("구글 시트 탭 URL을 1개 이상 입력해 주세요.");
+    const mode = document.getElementById('importMode').value;
+
+    const btn = document.getElementById('btnImport');
+    btn.disabled = true;
+    btn.innerText = "시트에서 단가 불러오는 중...";
+
+    try {
+      const res = await fetch(API_URL, {
+        method: "POST",
+        body: JSON.stringify({
+          action: "importFromSheets",
+          pw: savedPw,
+          rawUrlsText,
+          mode
+        })
+      });
+      const r = await res.json();
+      if (r.status === "success") {
+        alert(`✅ 총 ${r.count}개 품목의 매입단가를 성공적으로 불러왔습니다!`);
+        loadAdminData();
+      } else {
+        alert("가져오기 실패: " + r.message);
+      }
+    } catch (e) {
+      alert("통신 오류가 발생했습니다. URL 주소를 확인해 주세요.");
+    } finally {
+      btn.disabled = false;
+      btn.innerText = "🚀 시트 단가 불러오기";
+    }
+  }
+
+  function handleImageUpload(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const maxW = 1000;
+        const scale = Math.min(1, maxW / img.width);
+        canvas.width = img.width * scale;
+        canvas.height = img.height * scale;
+        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.75);
+        document.getElementById('cfgImgUrl').value = dataUrl;
+        document.getElementById('imgPreview').src = dataUrl;
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  async function saveBannerConfig() {
+    const mainImage = document.getElementById('cfgImgUrl').value.trim();
+    const mainTitle = document.getElementById('cfgTitle').value.trim();
+    const mainSub = document.getElementById('cfgSub').value.trim();
+    const res = await fetch(API_URL, {
+      method: "POST",
+      body: JSON.stringify({ action: "saveConfig", pw: savedPw, mainImage, mainTitle, mainSub })
+    });
+    const r = await res.json();
+    alert(r.status === "success" ? "메인 배너가 저장되었습니다." : "저장 실패");
+  }
+
+  function editPrice(id) {
+    const p = pricesCache.find(item => String(item.id) === String(id));
+    if (!p) return;
+    document.getElementById('editPriceId').value = p.id;
+    document.getElementById('pCat').value = p.category;
+    document.getElementById('pName').value = p.name;
+    document.getElementById('pVal').value = p.price;
+    document.getElementById('pNote').value = p.note;
+    document.getElementById('pName').focus();
+  }
+
+  function clearPriceForm() {
+    ['editPriceId','pCat','pName','pVal','pNote'].forEach(id => document.getElementById(id).value = "");
+  }
+
+  async function savePriceItem() {
+    const id = document.getElementById('editPriceId').value;
+    const category = document.getElementById('pCat').value.trim();
+    const name = document.getElementById('pName').value.trim();
+    const price = document.getElementById('pVal').value;
+    const note = document.getElementById('pNote').value.trim();
+    if (!category || !name || !price) return alert("분류, 상품명, 단가는 필수입니다.");
+
+    const res = await fetch(API_URL, {
+      method: "POST",
+      body: JSON.stringify({ action: "savePrice", pw: savedPw, id, category, name, price, note })
+    });
+    const r = await res.json();
+    if (r.status === "success") {
+      clearPriceForm();
+      loadAdminData();
+    }
+  }
+
+  async function deletePrice(id) {
+    if (!confirm("해당 단가 항목을 삭제하시겠습니까?")) return;
+    await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "deletePrice", pw: savedPw, id }) });
+    loadAdminData();
+  }
+
+  async function openAdminPost(id) {
+    selectedPostId = id;
+    const res = await fetch(`${API_URL}?action=getPostDetail&id=${id}&pw=${encodeURIComponent(savedPw)}`);
+    const data = await res.json();
+    if (data.status === "success") {
+      const p = data.post;
+      document.getElementById('apTitle').innerText = `[${p.method}] ${p.title}`;
+      document.getElementById('apMeta').innerText = `작성자: ${p.author} | 연락처: ${p.phone} | 작성일: ${p.createdAt}`;
+      document.getElementById('apContent').innerText = p.content;
+      document.getElementById('apReplyInput').value = p.reply || "";
+      document.getElementById('adminPostViewer').style.display = 'block';
+    }
+  }
+
+  async function saveAdminReply() {
+    const reply = document.getElementById('apReplyInput').value.trim();
+    const res = await fetch(API_URL, {
+      method: "POST",
+      body: JSON.stringify({ action: "replyPost", pw: savedPw, id: selectedPostId, reply })
+    });
+    const r = await res.json();
+    if (r.status === "success") {
+      alert("답변이 저장되었습니다.");
+      loadAdminData();
+    }
+  }
+
+  async function deleteAdminPost() {
+    if (!confirm("관리자 권한으로 이 게시글을 삭제하시겠습니까?")) return;
+    await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "deletePostAdmin", pw: savedPw, id: selectedPostId }) });
+    document.getElementById('adminPostViewer').style.display = 'none';
+    loadAdminData();
+  }
+</script>
+</body>
+</html>
