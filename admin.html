@@ -3,1131 +3,413 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>주식회사 메모리친구 | 중고 컴퓨터·부품 매입 전문</title>
+  <title>관리자 페이지 | 주식회사 메모리친구</title>
   <style>
-    :root {
-      --blue: #0284c7;
-      --blue-dark: #0369a1;
-      --green: #10b981;
-      --green-dark: #059669;
-      --navy: #0f172a;
-      --text: #1e293b;
-      --gray: #64748b;
-      --border: #e2e8f0;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "Segoe UI", Roboto, sans-serif; }
-    body { background: #f8fafc; color: var(--text); line-height: 1.55; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background: #f1f5f9; color: #1e293b; padding: 20px; }
+    .container { max-width: 1050px; margin: 0 auto; }
 
-    /* 상단 헤더 */
-    header { background: #ffffff; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04); }
-    .nav-wrap { max-width: 1140px; margin: 0 auto; padding: 0 20px; height: 72px; display: flex; justify-content: space-between; align-items: center; gap: 16px; }
-    
-    .brand { display: flex; align-items: center; gap: 10px; cursor: pointer; text-decoration: none; }
-    .brand-icon { width: 40px; height: 40px; background: linear-gradient(135deg, #0ea5e9, #0284c7); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 22px; box-shadow: 0 3px 8px rgba(2, 132, 199, 0.25); }
-    .brand-text { display: flex; flex-direction: column; }
-    .brand-name { font-size: 20px; font-weight: 900; color: #0f172a; letter-spacing: -0.5px; line-height: 1.15; }
-    .brand-sub { font-size: 11px; font-weight: 600; color: #64748b; }
+    .login-card { max-width: 360px; margin: 100px auto; background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); text-align: center; }
+    .login-card h2 { margin-bottom: 16px; }
+    .input { width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; }
+    .btn { padding: 10px 16px; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; }
+    .btn-primary { background: #1e40af; color: #fff; }
+    .btn-success { background: #15803d; color: #fff; }
+    .btn-danger { background: #dc2626; color: #fff; }
+    .btn-gray { background: #e2e8f0; color: #334155; }
 
-    .nav-menu { display: flex; gap: 28px; align-items: center; }
-    .nav-link { font-size: 15px; font-weight: 700; color: #334155; cursor: pointer; padding: 8px 4px; border-bottom: 2.5px solid transparent; transition: 0.2s; }
-    .nav-link:hover, .nav-link.active { color: var(--blue); border-bottom-color: var(--blue); }
+    .tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+    .tab-btn { padding: 10px 18px; border-radius: 8px; border: 1px solid #cbd5e1; background: #fff; font-weight: 700; cursor: pointer; }
+    .tab-btn.active { background: #1e40af; color: #fff; border-color: #1e40af; }
 
-    .header-actions { display: flex; align-items: center; gap: 12px; }
-    .btn-chat-top { background: var(--green); color: #fff; border: none; padding: 9px 16px; border-radius: 999px; font-size: 13px; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 5px; box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3); transition: 0.2s; }
-    .btn-chat-top:hover { background: var(--green-dark); }
-    .header-phone { font-size: 16px; font-weight: 900; color: #0f172a; text-decoration: none; display: flex; align-items: center; gap: 5px; }
+    .panel { display: none; background: #fff; padding: 24px; border-radius: 12px; border: 1px solid #e2e8f0; }
+    .panel.active { display: block; }
+    .form-row { display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; align-items: center; }
+    .preview-img { width: 100%; max-height: 240px; object-fit: cover; border-radius: 8px; margin-top: 10px; border: 1px solid #e2e8f0; }
 
-    .hamburger { display: none; font-size: 26px; background: none; border: none; cursor: pointer; color: #0f172a; }
+    .import-box { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 10px; padding: 18px; margin-bottom: 24px; }
+    .import-box h4 { color: #1e40af; margin-bottom: 6px; font-size: 16px; }
 
-    @media (max-width: 900px) {
-      .header-phone { display: none; }
-    }
-    @media (max-width: 768px) {
-      .hamburger { display: block; }
-      .btn-chat-top { display: none; }
-      .nav-menu { display: none; flex-direction: column; position: absolute; top: 72px; left: 0; width: 100%; background: #fff; padding: 16px 20px; border-bottom: 1px solid var(--border); gap: 12px; box-shadow: 0 10px 20px rgba(0,0,0,0.06); }
-      .nav-menu.open { display: flex; }
-    }
+    table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 14px; }
+    th, td { padding: 10px 12px; border-bottom: 1px solid #e2e8f0; text-align: left; }
+    th { background: #f8fafc; }
 
-    /* 페이지 전환 */
-    .page-section { display: none; animation: fadeIn 0.25s ease; }
-    .page-section.active { display: block; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
-    .container { max-width: 1140px; margin: 0 auto; padding: 0 20px 70px; }
-
-    /* ================= 1. 메인페이지 (와이드 비율 이미지 적용) ================= */
-    .hero-wrap {
-      background: linear-gradient(125deg, #e0f2fe 0%, #f0f9ff 50%, #dbeafe 100%);
-      border-bottom: 1px solid #bae6fd;
-      padding: 44px 20px 64px;
-      overflow: hidden;
-    }
-    .hero-inner {
-      max-width: 1140px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: 1.15fr 0.85fr;
-      align-items: center;
-      gap: 24px;
-    }
-    .hero-title {
-      font-size: 38px;
-      font-weight: 900;
-      color: #0f172a;
-      line-height: 1.28;
-      letter-spacing: -1px;
-      margin-bottom: 18px;
-    }
-    .hero-title .highlight { color: #16a34a; }
-    .hero-sub-text { font-size: 15px; color: #475569; margin-bottom: 18px; font-weight: 500; }
-    .hero-checks { display: flex; flex-wrap: wrap; gap: 14px; }
-    .check-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 700; color: #1e293b; background: rgba(255,255,255,0.75); padding: 6px 12px; border-radius: 999px; border: 1px solid #bae6fd; }
-    .check-dot { width: 18px; height: 18px; background: var(--green); color: #fff; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; }
-
-    .hero-visual {
-      position: relative;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-    .hero-visual img {
-      width: 100%;
-      max-width: 440px;
-      height: 260px;
-      object-fit: cover;
-      border-radius: 18px;
-      box-shadow: 0 16px 32px rgba(2, 132, 199, 0.18);
-      border: 3px solid #ffffff;
-    }
-    .floating-chip {
-      position: absolute;
-      bottom: -12px;
-      left: 16px;
-      background: #0f172a;
-      color: #fff;
-      padding: 8px 16px;
-      border-radius: 10px;
-      font-size: 13px;
-      font-weight: 800;
-      box-shadow: 0 6px 16px rgba(15, 23, 42, 0.25);
-    }
-
-    @media (max-width: 820px) {
-      .hero-inner { grid-template-columns: 1fr; text-align: left; }
-      .hero-title { font-size: 28px; }
-      .hero-visual img { max-width: 100%; height: 210px; }
-    }
-
-    /* 중단 2단 그리드: [내 부품 얼마에 팔 수 있을까요?] + [수도권 빠른 방문 수거] */
-    .mid-dashboard {
-      max-width: 1140px;
-      margin: -34px auto 28px;
-      padding: 0 20px;
-      display: grid;
-      grid-template-columns: 1.85fr 1fr;
-      gap: 20px;
-      position: relative;
-      z-index: 10;
-    }
-    @media (max-width: 900px) { .mid-dashboard { grid-template-columns: 1fr; margin-top: -24px; } }
-
-    .quick-price-card {
-      background: #ffffff;
-      border-radius: 18px;
-      padding: 24px;
-      box-shadow: 0 10px 28px rgba(15, 23, 42, 0.07);
-      border: 1px solid #e2e8f0;
-    }
-    .qp-head { font-size: 18px; font-weight: 800; color: #0f172a; margin-bottom: 16px; display: flex; align-items: center; gap: 6px; }
-    .qp-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 16px; }
-    @media (max-width: 600px) { .qp-grid { grid-template-columns: repeat(3, 1fr); } }
-
-    .qp-item {
-      background: #f8fafc;
-      border: 1.5px solid #e2e8f0;
-      border-radius: 12px;
-      padding: 14px 6px;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-    .qp-item:hover {
-      border-color: #0284c7;
-      background: #f0f9ff;
-      transform: translateY(-3px);
-      box-shadow: 0 6px 14px rgba(2, 132, 199, 0.12);
-    }
-    .qp-icon { font-size: 30px; margin-bottom: 6px; }
-    .qp-name { font-size: 13px; font-weight: 800; color: #0f172a; margin-bottom: 3px; }
-    .qp-link { font-size: 11px; font-weight: 700; color: #0284c7; }
-
-    .btn-all-price {
-      width: 100%;
-      padding: 14px;
-      background: linear-gradient(90deg, #10b981, #059669);
-      color: #ffffff;
-      border: none;
-      border-radius: 999px;
-      font-size: 15px;
-      font-weight: 800;
-      cursor: pointer;
-      box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
-      transition: 0.2s;
-    }
-    .btn-all-price:hover { filter: brightness(1.05); transform: translateY(-1px); }
-
-    /* 우측 파란색 수도권 방문 수거 카드 */
-    .pickup-banner-card {
-      background: linear-gradient(145deg, #0284c7, #0369a1);
-      border-radius: 18px;
-      padding: 26px 24px;
-      color: #ffffff;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      box-shadow: 0 10px 28px rgba(2, 132, 199, 0.22);
-      cursor: pointer;
-      transition: 0.2s;
-      position: relative;
-      overflow: hidden;
-    }
-    .pickup-banner-card:hover { transform: translateY(-2px); }
-    .pickup-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 800; color: #fde047; margin-bottom: 6px; }
-    .pickup-title { font-size: 24px; font-weight: 900; line-height: 1.25; margin-bottom: 8px; }
-    .pickup-desc { font-size: 14px; color: #e0f2fe; margin-bottom: 16px; }
-    .pickup-bottom { display: flex; justify-content: space-between; align-items: flex-end; }
-    .pickup-cta { background: #ffffff; color: #0369a1; padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 800; }
-    .pickup-truck { font-size: 54px; line-height: 1; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2)); }
-
-    /* 4가지 약속 아이콘 바 */
-    .trust-bar {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 14px;
-      margin-bottom: 34px;
-    }
-    @media (max-width: 768px) { .trust-bar { grid-template-columns: repeat(2, 1fr); } }
-    .trust-item {
-      background: #ffffff;
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 16px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.03);
-    }
-    .trust-circle { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
-    .tc-blue { background: #e0f2fe; color: #0284c7; }
-    .tc-green { background: #dcfce7; color: #16a34a; }
-    .trust-text strong { display: block; font-size: 15px; font-weight: 800; color: #0f172a; }
-    .trust-text span { font-size: 12px; color: #64748b; }
-
-    /* 하단 2단 섹션: [이런 제품도 매입합니다] + [메모리친구가 선택받는 이유] */
-    .bottom-grid {
-      display: grid;
-      grid-template-columns: 1.85fr 1fr;
-      gap: 20px;
-      align-items: stretch;
-    }
-    @media (max-width: 900px) { .bottom-grid { grid-template-columns: 1fr; } }
-
-    .more-items-box {
-      background: #ffffff;
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 26px 24px;
-    }
-    .more-items-box h3 { font-size: 20px; font-weight: 900; color: #0f172a; margin-bottom: 4px; }
-    .more-items-box p { font-size: 14px; color: #64748b; margin-bottom: 18px; }
-    .more-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
-    @media (max-width: 680px) { .more-grid { grid-template-columns: repeat(3, 1fr); } }
-    .more-card {
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      border-radius: 12px;
-      padding: 14px 6px;
-      text-align: center;
-      cursor: pointer;
-      transition: 0.15s;
-    }
-    .more-card:hover { background: #eff6ff; border-color: #93c5fd; }
-    .more-card .m-ico { font-size: 28px; margin-bottom: 6px; }
-    .more-card .m-lbl { font-size: 12px; font-weight: 700; color: #334155; }
-
-    .why-box {
-      background: linear-gradient(160deg, #f0fdf4 0%, #dcfce7 100%);
-      border: 1px solid #bbf7d0;
-      border-radius: 18px;
-      padding: 26px 24px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-    .why-box h3 { font-size: 20px; font-weight: 900; color: #0f172a; line-height: 1.3; margin-bottom: 14px; }
-    .why-list { list-style: none; margin-bottom: 18px; }
-    .why-list li { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 700; color: #1e293b; margin-bottom: 8px; }
-    .btn-why-chat {
-      width: 100%;
-      padding: 13px;
-      background: #10b981;
-      color: #fff;
-      border: none;
-      border-radius: 12px;
-      font-size: 14px;
-      font-weight: 800;
-      cursor: pointer;
-      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
-      transition: 0.2s;
-    }
-    .btn-why-chat:hover { background: #059669; }
-
-    /* ================= 서브 페이지 공통 ================= */
-    .sub-container { max-width: 1140px; margin: 0 auto; padding: 36px 20px 80px; }
-    .sec-header { text-align: center; margin-bottom: 28px; }
-    .sec-header h2 { font-size: 28px; font-weight: 800; color: var(--navy); margin-bottom: 8px; }
-    .sec-header p { color: var(--gray); font-size: 15px; }
-    .btn { padding: 12px 22px; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; border: none; transition: 0.2s; }
-    .btn-primary { background: #0284c7; color: #fff; }
-    .btn-primary:hover { background: #0369a1; }
-
-    /* 2. 매입단가 3단 탭 UI */
-    .price-box-wrap { background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
-    .top-cat-container { display: flex; justify-content: space-between; align-items: center; gap: 10px; overflow-x: auto; padding-bottom: 14px; width: 100%; }
-    .top-cat-item { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; min-width: 78px; padding: 14px 8px; cursor: pointer; background-color: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 12px; transition: all 0.2s ease; user-select: none; }
-    .top-cat-item:hover { background-color: #f1f5f9; border-color: #cbd5e1; transform: translateY(-2px); }
-    .top-cat-icon { font-size: 26px; margin-bottom: 4px; }
-    .top-cat-label { font-size: 13px; font-weight: 700; color: #475569; }
-    .top-cat-item.active { background: linear-gradient(135deg, #0284c7, #0369a1); border-color: #0284c7; box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25); transform: translateY(-2px); }
-    .top-cat-item.active .top-cat-label { color: #ffffff; font-weight: 800; }
-
-    .price-search-wrap { margin-bottom: 14px; }
-    .price-search-input { width: 100%; padding: 12px 14px; font-size: 14px; border: 1.5px solid #cbd5e1; border-radius: 8px; outline: none; background-color: #f8fafc; }
-    .price-search-input:focus { border-color: #0284c7; background-color: #fff; box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15); }
-
-    .mid-tab-table { display: grid; grid-template-columns: repeat(5, 1fr); border-top: 1px solid #cbd5e1; border-left: 1px solid #cbd5e1; margin-bottom: 10px; background-color: #f8fafc; }
-    @media (max-width: 640px) { .mid-tab-table { grid-template-columns: repeat(2, 1fr); } }
-    .mid-tab-btn { padding: 11px 8px; text-align: center; font-size: 14px; font-weight: 700; color: #334155; background-color: #f8fafc; border-right: 1px solid #cbd5e1; border-bottom: 1px solid #cbd5e1; cursor: pointer; user-select: none; }
-    .mid-tab-btn.active { background-color: #ffffff; color: #0284c7; border: 1.5px solid #0284c7; position: relative; z-index: 2; }
-    .mid-tab-btn.empty { cursor: default; background-color: #f8fafc; }
-    @media (max-width: 640px) { .mid-tab-btn.empty { display: none; } }
-
-    .sub-tab-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 6px 6px 12px 6px; font-size: 14px; font-weight: 800; border-bottom: 1px solid #e2e8f0; margin-bottom: 12px; }
-    .sub-tab-link { cursor: pointer; padding: 4px 6px; border-radius: 4px; user-select: none; }
-    .sub-tab-link.active { text-decoration: underline; text-underline-offset: 6px; text-decoration-thickness: 2.5px; background-color: #f8fafc; }
-    .sub-divider { color: #cbd5e1; font-weight: 400; font-size: 12px; }
-
-    .t-orange { color: #ff6600; } .t-pink { color: #ff0066; } .t-purple { color: #6633cc; } .t-blue { color: #3333cc; } .t-green { color: #009900; } .t-teal { color: #00aa99; }
-
-    .price-table-wrap { border-top: 2px solid #94a3b8; border-bottom: 1px solid #cbd5e1; overflow-x: auto; }
-    .price-table { width: 100%; border-collapse: collapse; min-width: 480px; }
-    .price-table th { background-color: #e2e8f0; color: #1e293b; font-weight: 700; font-size: 14px; padding: 12px 10px; border-bottom: 1px solid #94a3b8; text-align: center; }
-    .price-table tbody tr { border-bottom: 1px solid #cbd5e1; background: #fff; }
-    .price-table tbody tr:nth-child(even) { background-color: #f2f6fa; }
-    .price-table tbody tr:hover { background-color: #e8f0fe; }
-    .price-table td { padding: 11px 12px; font-size: 14px; }
-    .td-p-cat { width: 24%; text-align: center; font-weight: 700; color: #334155; }
-    .highlight-gen { color: #ff6600; font-weight: 800; }
-    .td-p-name { width: 48%; text-align: left; color: #334155; font-weight: 500; }
-    .td-p-val { width: 28%; text-align: right; font-weight: 700; color: #1e293b; padding-right: 18px; }
-
-    /* 3. 매입문의 게시판 */
-    .board-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px; }
-    .table-wrap { background: #fff; border-radius: 12px; border: 1px solid var(--border); overflow-x: auto; }
-    .board-table { width: 100%; border-collapse: collapse; min-width: 560px; }
-    .board-table th, .board-table td { padding: 14px 16px; text-align: left; border-bottom: 1px solid #f1f5f9; font-size: 14px; }
-    .board-table th { background: #f8fafc; font-weight: 700; color: #475569; }
-    .badge { display: inline-block; padding: 3px 9px; border-radius: 20px; font-size: 12px; font-weight: 700; background: #e0f2fe; color: #0284c7; }
-    .post-row { cursor: pointer; transition: background 0.15s; }
-    .post-row:hover { background: #f8fafc; }
-    .status-pill { padding: 3px 8px; border-radius: 6px; font-size: 12px; font-weight: 700; }
-    .st-wait { background: #fef3c7; color: #b45309; }
-    .st-done { background: #dcfce7; color: #15803d; }
-
-    /* 모달 */
-    .modal-backdrop { display: none; position: fixed; inset: 0; background: rgba(15,23,42,0.55); z-index: 200; align-items: center; justify-content: center; padding: 16px; }
-    .modal-backdrop.open { display: flex; }
-    .modal-box { background: #fff; width: 100%; max-width: 540px; border-radius: 14px; padding: 24px; max-height: 90vh; overflow-y: auto; }
-    .modal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
-    .form-group { margin-bottom: 14px; }
-    .form-group label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 5px; color: #334155; }
-    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; }
-    .reply-box { background: #eff6ff; border-left: 4px solid #0284c7; padding: 14px; border-radius: 6px; margin-top: 16px; font-size: 14px; }
-
-    /* 4. 회사소개 */
-    .card { background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 28px 24px; }
-    .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: center; }
-    @media (max-width: 768px) { .about-grid { grid-template-columns: 1fr; } }
-    .info-list { list-style: none; }
-    .info-list li { padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 15px; display: flex; }
-    .info-list strong { width: 110px; color: var(--navy); flex-shrink: 0; }
-
-    footer { background: var(--navy); color: #94a3b8; text-align: center; padding: 34px 20px; font-size: 13px; margin-top: 40px; }
+    .post-detail-card { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 16px; margin-top: 16px; }
   </style>
 </head>
 <body>
 
-  <!-- 상단 메뉴 -->
-  <header>
-    <div class="nav-wrap">
-      <a class="brand" onclick="showPage('home')">
-        <div class="brand-icon">🖥️</div>
-        <div class="brand-text">
-          <span class="brand-name">메모리친구</span>
-          <span class="brand-sub">중고 컴퓨터·부품 매입 전문</span>
-        </div>
-      </a>
+  <!-- 관리자 로그인 -->
+  <div id="loginBox" class="login-card">
+    <h2>🔒 관리자 인증</h2>
+    <input type="password" id="adminPw" class="input" style="text-align:center; margin-bottom:12px;" placeholder="관리자 비밀번호" onkeyup="if(event.key==='Enter') adminLogin()">
+    <button class="btn btn-primary" style="width:100%;" onclick="adminLogin()">로그인</button>
+  </div>
 
-      <nav class="nav-menu" id="navMenu">
-        <a class="nav-link active" data-target="home" onclick="showPage('home')">매입안내</a>
-        <a class="nav-link" data-target="prices" onclick="showPage('prices')">매입가확인</a>
-        <a class="nav-link" data-target="board" onclick="showPage('board')">빠른수거안내</a>
-        <a class="nav-link" data-target="about" onclick="showPage('about')">고객센터</a>
-      </nav>
-
-      <div class="header-actions">
-        <button class="btn-chat-top" onclick="openChannelTalk()">💬 빠른상담</button>
-        <a href="tel:010-3247-9257" class="header-phone">📞 010-3247-9257</a>
-        <button class="hamburger" onclick="document.getElementById('navMenu').classList.toggle('open')">☰</button>
-      </div>
-    </div>
-  </header>
-
-  <!-- 1. 메인페이지 -->
-  <section id="sec-home" class="page-section active">
-    <!-- 히어로 영역 -->
-    <div class="hero-wrap">
-      <div class="hero-inner">
-        <div>
-          <h1 class="hero-title" id="heroTitle">
-            안 쓰는 컴퓨터와 부품,<br>
-            <span class="highlight">메모리친구</span>가<br>
-            제대로 된 가격에 매입합니다!
-          </h1>
-          <p class="hero-sub-text" id="heroSub">방문 · 택배 · 수도권 출장 매입 모두 가능! 접수 즉시 투명한 단가로 정산해 드립니다.</p>
-          <div class="hero-checks">
-            <span class="check-badge"><span class="check-dot">✓</span> 빠른 가격 확인</span>
-            <span class="check-badge"><span class="check-dot">✓</span> 수도권 빠른 수거</span>
-            <span class="check-badge"><span class="check-dot">✓</span> 신속한 입금</span>
-          </div>
-        </div>
-        <div class="hero-visual">
-          <img id="heroMainImg" src="https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=1000&q=85" alt="중고 컴퓨터 부품 매입">
-          <div class="floating-chip">CPU · VGA · RAM · SSD · 메인보드 최고가 매입</div>
-        </div>
-      </div>
+  <!-- 관리자 대시보드 -->
+  <div id="adminPanel" class="container" style="display:none;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+      <h2>⚙️ 주식회사 메모리친구 관리자</h2>
+      <button class="btn btn-gray" onclick="loadAdminData()">🔄 새로고침</button>
     </div>
 
-    <!-- 중단 2단 카드: [내 부품 얼마에 팔 수 있을까요?] + [수도권 빠른 방문 수거] -->
-    <div class="mid-dashboard">
-      <div class="quick-price-card">
-        <div class="qp-head">⚡ 내 부품, 얼마에 팔 수 있을까요?</div>
-        <div class="qp-grid">
-          <div class="qp-item" onclick="goPriceTab('CPU')">
-            <div class="qp-icon">🔲</div>
-            <div class="qp-name">CPU</div>
-            <div class="qp-link">매입가 확인 &gt;</div>
-          </div>
-          <div class="qp-item" onclick="goPriceTab('VGA')">
-            <div class="qp-icon">🎮</div>
-            <div class="qp-name">그래픽카드</div>
-            <div class="qp-link">매입가 확인 &gt;</div>
-          </div>
-          <div class="qp-item" onclick="goPriceTab('RAM')">
-            <div class="qp-icon">📏</div>
-            <div class="qp-name">메모리 RAM</div>
-            <div class="qp-link">매입가 확인 &gt;</div>
-          </div>
-          <div class="qp-item" onclick="goPriceTab('BOARD')">
-            <div class="qp-icon">🎛️</div>
-            <div class="qp-name">메인보드</div>
-            <div class="qp-link">매입가 확인 &gt;</div>
-          </div>
-          <div class="qp-item" onclick="goPriceTab('SSD')">
-            <div class="qp-icon">💾</div>
-            <div class="qp-name">SSD</div>
-            <div class="qp-link">매입가 확인 &gt;</div>
-          </div>
-        </div>
-        <button class="btn-all-price" onclick="showPage('prices')">전체 품목 매입가 확인하기 →</button>
-      </div>
-
-      <div class="pickup-banner-card" onclick="openWriteModal('출장매입')">
-        <div>
-          <div class="pickup-badge">📍 수도권</div>
-          <div class="pickup-title">빠른 방문 수거</div>
-          <div class="pickup-desc">다량 부품 · PC방 · 기업 불용자산<br>지금 바로 출장 수거 상담하세요!</div>
-        </div>
-        <div class="pickup-bottom">
-          <span class="pickup-cta">출장·방문 접수하기 &gt;</span>
-          <span class="pickup-truck">🚚</span>
-        </div>
-      </div>
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('banner', this)">1. 메인 이미지 관리</button>
+      <button class="tab-btn" onclick="switchTab('prices', this)">2. 매입단가 관리</button>
+      <button class="tab-btn" onclick="switchTab('board', this)">3. 게시판 관리</button>
     </div>
 
-    <!-- 메인 하단 컨테이너 -->
-    <div class="container">
-      <div class="trust-bar">
-        <div class="trust-item">
-          <div class="trust-circle tc-blue">🎧</div>
-          <div class="trust-text"><strong>빠른 상담</strong><span>실시간 채팅 상담</span></div>
-        </div>
-        <div class="trust-item">
-          <div class="trust-circle tc-blue">🚚</div>
-          <div class="trust-text"><strong>빠른 수거</strong><span>수도권 당일 방문</span></div>
-        </div>
-        <div class="trust-item">
-          <div class="trust-circle tc-green">🛡️</div>
-          <div class="trust-text"><strong>안전한 거래</strong><span>믿을 수 있는 매입</span></div>
-        </div>
-        <div class="trust-item">
-          <div class="trust-circle tc-green">💰</div>
-          <div class="trust-text"><strong>빠른 입금</strong><span>검수 후 즉시 입금</span></div>
-        </div>
+    <!-- 1. 메인 이미지 관리 -->
+    <div id="tab-banner" class="panel active">
+      <h3 style="margin-bottom:16px;">메인페이지 배너 이미지 및 문구 설정</h3>
+      <div style="margin-bottom:12px;">
+        <label style="font-size:13px; font-weight:700;">배경 이미지 URL (또는 로컬 파일 업로드 시 자동 압축·변환)</label>
+        <input type="text" id="cfgImgUrl" class="input" style="margin-top:4px;" oninput="document.getElementById('imgPreview').src=this.value">
+        <input type="file" accept="image/*" style="margin-top:8px; font-size:13px;" onchange="handleImageUpload(this)">
       </div>
-
-      <div class="bottom-grid">
-        <div class="more-items-box">
-          <h3>이런 제품도 매입합니다</h3>
-          <p>완본체 PC, 노트북, 모니터, PC방 폐업 물량, 기업 중고 장비까지 일괄 매입!</p>
-          <div class="more-grid">
-            <div class="more-card" onclick="openWriteModal('방문매입')"><div class="m-ico">🖥️</div><div class="m-lbl">완본체 PC</div></div>
-            <div class="more-card" onclick="openWriteModal('택배매입')"><div class="m-ico">💻</div><div class="m-lbl">노트북</div></div>
-            <div class="more-card" onclick="openWriteModal('방문매입')"><div class="m-ico">🖵</div><div class="m-lbl">모니터</div></div>
-            <div class="more-card" onclick="goPriceTab('VGA')"><div class="m-ico">🎮</div><div class="m-lbl">그래픽카드</div></div>
-            <div class="more-card" onclick="openWriteModal('출장매입')"><div class="m-ico">🗄️</div><div class="m-lbl">서버·워크스테이션</div></div>
-            <div class="more-card" onclick="openWriteModal('출장매입')"><div class="m-ico">🏢</div><div class="m-lbl">기업 장비</div></div>
-          </div>
-        </div>
-
-        <div class="why-box">
-          <div>
-            <h3>메모리친구가<br>선택받는 이유</h3>
-            <ul class="why-list">
-              <li><span class="check-dot">✓</span> 정직한 매입가 (투명한 단가 공개)</li>
-              <li><span class="check-dot">✓</span> 신속한 처리 (당일 검수 및 입금)</li>
-              <li><span class="check-dot">✓</span> 친절한 상담 (방문·택배·출장 맞춤)</li>
-            </ul>
-          </div>
-          <button class="btn-why-chat" onclick="openChannelTalk()">💬 빠른 채팅 상담 바로 연결하기 &gt;</button>
-        </div>
+      <div style="margin-bottom:12px;">
+        <label style="font-size:13px; font-weight:700;">메인 타이틀 문구</label>
+        <input type="text" id="cfgTitle" class="input" style="margin-top:4px;">
       </div>
+      <div style="margin-bottom:14px;">
+        <label style="font-size:13px; font-weight:700;">서브 설명 문구</label>
+        <input type="text" id="cfgSub" class="input" style="margin-top:4px;">
+      </div>
+      <button id="btnSaveBanner" class="btn btn-primary" onclick="saveBannerConfig()">💾 메인 설정 저장하기</button>
+      <img id="imgPreview" class="preview-img" src="">
     </div>
-  </section>
 
-  <!-- 2. 매입단가 페이지 (3단 탭 구조) -->
-  <section id="sec-prices" class="page-section">
-    <div class="sub-container">
-      <div class="sec-header">
-        <h2>품목별 기준 매입단가표</h2>
-        <p>부품 카테고리와 세대/시리즈를 선택하여 실시간 매입 단가를 확인하세요.</p>
-      </div>
+    <!-- 2. 매입단가 관리 -->
+    <div id="tab-prices" class="panel">
+      <div class="import-box">
+        <h4>📥 구글 시트 탭 URL 또는 gid 번호로 단가 불러오기 (수동 갱신)</h4>
+        <p style="font-size:13px; color:#475569; margin-bottom:10px;">
+          양식(<code>A:TAB-1 / B:TAB-2 / C:TAB-3 / D:분류 / E:상품 / F:단가</code>)에 맞춘 각 시트 탭의 주소 또는 <code>gid</code> 숫자를 한 줄에 하나씩 입력하세요.
+        </p>
+        <textarea id="sheetUrlsInput" class="input" rows="4" style="margin-bottom:10px;" placeholder="937997417&#10;679465934"></textarea>
 
-      <div class="price-box-wrap">
-        <div class="top-cat-container" id="topCats">
-          <div class="top-cat-item active" data-cat="CPU" onclick="selectTopCat('CPU', this)">
-            <div class="top-cat-icon">🔲</div>
-            <div class="top-cat-label">CPU</div>
-          </div>
-          <div class="top-cat-item" data-cat="BOARD" onclick="selectTopCat('BOARD', this)">
-            <div class="top-cat-icon">🎛️</div>
-            <div class="top-cat-label">BOARD</div>
-          </div>
-          <div class="top-cat-item" data-cat="RAM" onclick="selectTopCat('RAM', this)">
-            <div class="top-cat-icon">📏</div>
-            <div class="top-cat-label">램</div>
-          </div>
-          <div class="top-cat-item" data-cat="SSD" onclick="selectTopCat('SSD', this)">
-            <div class="top-cat-icon">💾</div>
-            <div class="top-cat-label">SSD</div>
-          </div>
-          <div class="top-cat-item" data-cat="HDD" onclick="selectTopCat('HDD', this)">
-            <div class="top-cat-icon">🗄️</div>
-            <div class="top-cat-label">HDD</div>
-          </div>
-          <div class="top-cat-item" data-cat="VGA" onclick="selectTopCat('VGA', this)">
-            <div class="top-cat-icon">🎮</div>
-            <div class="top-cat-label">VGA</div>
-          </div>
-        </div>
-
-        <div class="price-search-wrap">
-          <input type="text" id="priceSearch" class="price-search-input" placeholder="🔍 현재 선택된 탭 안에서 모델명 검색 (전체 검색은 '전체' 탭 선택)..." oninput="renderPriceTable()">
-        </div>
-
-        <div class="mid-tab-table" id="midTabs"></div>
-        <div class="sub-tab-bar" id="subTabs"></div>
-
-        <div class="price-table-wrap">
-          <table class="price-table">
-            <thead>
-              <tr>
-                <th style="width:24%;">분류</th>
-                <th style="width:48%;">상품</th>
-                <th style="width:28%;">단가</th>
-              </tr>
-            </thead>
-            <tbody id="priceTableBody">
-              <tr><td colspan="3" style="text-align:center; padding:36px; color:#64748b; font-weight:600;">단가 데이터를 불러오는 중...</td></tr>
-            </tbody>
-          </table>
+        <div class="form-row" style="margin-bottom:0;">
+          <select id="importMode" class="input" style="width:auto;">
+            <option value="replace">기존 단가 전체 교체 (덮어쓰기)</option>
+            <option value="append">기존 단가 아래에 추가하기</option>
+          </select>
+          <button id="btnImport" class="btn btn-success" onclick="importFromSheetUrls()">🚀 시트 단가 불러오기</button>
         </div>
       </div>
-    </div>
-  </section>
 
-  <!-- 3. 매입문의게시판 (빠른수거안내) -->
-  <section id="sec-board" class="page-section">
-    <div class="sub-container">
-      <div class="sec-header">
-        <h2>빠른수거안내 · 매입문의 게시판</h2>
-        <p>회원가입 없이 비밀글로 견적 및 방문·택배·출장 매입을 신청하실 수 있습니다.</p>
+      <h3 style="margin-bottom:12px;">개별 매입단가 직접 등록 / 수정</h3>
+      <input type="hidden" id="editPriceId">
+      <div class="form-row">
+        <input type="text" id="pCat" class="input" style="flex:1; min-width:100px;" placeholder="분류 (예: CPU)">
+        <input type="text" id="pName" class="input" style="flex:2.5; min-width:180px;" placeholder="상품명">
+        <input type="number" id="pVal" class="input" style="flex:1; min-width:110px;" placeholder="단가(원)">
+        <input type="text" id="pNote" class="input" style="flex:1.8; min-width:150px;" placeholder="세부분류 / 비고">
+        <button class="btn btn-primary" onclick="savePriceItem()">저장</button>
+        <button class="btn btn-gray" onclick="clearPriceForm()">초기화</button>
       </div>
-      <div class="board-top">
-        <span style="font-size:14px; color:var(--gray);">🔒 모든 게시글은 작성 시 설정한 비밀번호로 보호됩니다.</span>
-        <button class="btn btn-primary" onclick="openWriteModal('택배매입')">✏️ 매입 문의하기</button>
+
+      <div class="form-row" style="margin-top:20px; padding-top:16px; border-top:1px solid #e2e8f0;">
+        <select id="adminCatFilter" class="input" style="width:150px;" onchange="renderAdminPrices()">
+          <option value="전체">전체 분류</option>
+        </select>
+        <input type="text" id="adminPriceSearch" class="input" style="flex:1; min-width:180px;" placeholder="등록된 품목 검색 (수정/삭제할 모델명 입력)..." onkeyup="renderAdminPrices()">
+        <span style="font-size:13px; color:#64748b;">총 <strong id="priceCount">0</strong>개</span>
       </div>
-      <div class="table-wrap">
-        <table class="board-table">
+
+      <div style="overflow-x:auto; max-height:520px; overflow-y:auto;">
+        <table>
           <thead>
-            <tr>
-              <th style="width:100px;">매입방식</th>
-              <th>제목</th>
-              <th style="width:100px;">작성자</th>
-              <th style="width:110px;">작성일</th>
-              <th style="width:95px;">답변상태</th>
-            </tr>
+            <tr><th>분류</th><th>상품명</th><th>단가</th><th>비고</th><th style="width:130px;">관리</th></tr>
           </thead>
-          <tbody id="boardTableBody">
-            <tr><td colspan="5" style="text-align:center; padding:40px; color:#94a3b8;">게시글을 불러오는 중입니다...</td></tr>
-          </tbody>
+          <tbody id="adminPriceBody"></tbody>
         </table>
       </div>
     </div>
-  </section>
 
-  <!-- 4. 회사소개 페이지 (고객센터) -->
-  <section id="sec-about" class="page-section">
-    <div class="sub-container">
-      <div class="sec-header">
-        <h2>회사소개 및 고객센터 안내</h2>
-        <p>투명한 시세 산정과 신속한 정산으로 신뢰받는 부품 매입 파트너입니다.</p>
+    <!-- 3. 게시판 관리 -->
+    <div id="tab-board" class="panel">
+      <h3 style="margin-bottom:14px;">매입문의 게시판 관리 (비밀글 열람 및 답변)</h3>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr><th>방식</th><th>제목</th><th>작성자</th><th>작성일</th><th>상태</th><th>관리</th></tr>
+          </thead>
+          <tbody id="adminBoardBody"></tbody>
+        </table>
       </div>
-      <div class="card about-grid">
-        <div>
-          <h3 style="font-size:22px; margin-bottom:14px;">정직한 검수, 당일 즉시 정산</h3>
-          <p style="color:#475569; font-size:15px; margin-bottom:20px;">
-            불필요한 이유를 들어 단가를 후려치지 않습니다. 사전에 안내된 기준 단가표와 명확한 검수 기준을 바탕으로 개인 고객부터 기업 불용자산까지 안전하게 매입합니다.
-          </p>
-          <ul class="info-list">
-            <li><strong>회사명</strong> <span>주식회사 메모리친구 매입센터</span></li>
-            <li><strong>매입방식</strong> <span>방문 매입 / 택배 매입 / 출장 매입</span></li>
-            <li><strong>영업시간</strong> <span>평일 09:30 ~ 18:00 (주말·공휴일 예약제)</span></li>
-            <li><strong>대표전화</strong> <span>010-3247-9257 / 010-3421-4999</span></li>
-            <li><strong>주소</strong> <span>경기도 부천시 원미구 옥산로 251번길 51, 어주빌딩 2층</span></li>
-          </ul>
-        </div>
-        <div style="background:#f0f9ff; border:1px solid #bae6fd; border-radius:12px; padding:26px; text-align:center;">
-          <div style="font-size:42px; margin-bottom:10px;">📍</div>
-          <h4 style="margin-bottom:8px; font-size:18px;">방문 및 택배 발송처 안내</h4>
-          <p style="font-size:14px; color:#475569; margin-bottom:18px;">택배 발송 전 문의게시판 또는 실시간 채팅으로 접수해 주시면<br>안전 포장 안내 및 송장 접수를 도와드립니다.</p>
-          <button class="btn btn-primary" style="width:100%; margin-bottom:8px;" onclick="openWriteModal('방문매입')">출장 / 방문 / 택배 접수하기</button>
-          <button class="btn" style="width:100%; background:#10b981; color:#fff;" onclick="openChannelTalk()">💬 실시간 채팅 상담 열기</button>
-        </div>
-      </div>
-    </div>
-  </section>
 
-  <!-- 글쓰기 모달 -->
-  <div id="writeModal" class="modal-backdrop">
-    <div class="modal-box">
-      <div class="modal-head">
-        <h3>📝 매입 문의 작성</h3>
-        <button style="background:none; border:none; font-size:20px; cursor:pointer;" onclick="closeModal('writeModal')">✕</button>
-      </div>
-      <div class="form-group">
-        <label>희망 매입 방식 *</label>
-        <select id="wMethod">
-          <option value="택배매입">택배 매입</option>
-          <option value="방문매입">방문 매입</option>
-          <option value="출장매입">출장 매입</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>제목 *</label>
-        <input type="text" id="wTitle" placeholder="예: 그래픽카드 및 CPU 일괄 매입 문의드립니다">
-      </div>
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-        <div class="form-group">
-          <label>작성자 성함 *</label>
-          <input type="text" id="wAuthor" placeholder="홍길동">
-        </div>
-        <div class="form-group">
-          <label>연락처 *</label>
-          <input type="tel" id="wPhone" placeholder="010-1234-5678">
-        </div>
-      </div>
-      <div class="form-group">
-        <label>게시글 비밀번호 (열람/삭제 시 필요) *</label>
-        <input type="password" id="wPassword" placeholder="숫자 또는 영문 4자리 이상">
-      </div>
-      <div class="form-group">
-        <label>부품 목록 및 문의 내용 *</label>
-        <textarea id="wContent" rows="4" placeholder="품목명, 수량, 상태(박스유무/정상작동 여부), 출장 시 지역 등을 적어주세요."></textarea>
-      </div>
-      <button id="btnSubmitPost" class="btn btn-primary" style="width:100%;" onclick="submitPost()">비밀글 등록하기</button>
-    </div>
-  </div>
-
-  <!-- 비밀번호 확인 & 상세보기 모달 -->
-  <div id="viewModal" class="modal-backdrop">
-    <div class="modal-box">
-      <div class="modal-head">
-        <h3 id="vModalTitle">🔒 비밀글 확인</h3>
-        <button style="background:none; border:none; font-size:20px; cursor:pointer;" onclick="closeModal('viewModal')">✕</button>
-      </div>
-      <div id="pwCheckArea">
-        <p style="font-size:14px; color:var(--gray); margin-bottom:12px;">작성 시 입력한 비밀번호를 입력해 주세요.</p>
-        <input type="password" id="vPasswordInput" style="width:100%; padding:10px 12px; border:1px solid #cbd5e1; border-radius:8px; margin-bottom:12px;" placeholder="비밀번호 입력" onkeyup="if(event.key==='Enter') verifyAndRead()">
-        <button class="btn btn-primary" style="width:100%;" onclick="verifyAndRead()">확인</button>
-      </div>
-      <div id="postDetailArea" style="display:none;">
-        <div style="font-size:13px; color:var(--gray); margin-bottom:10px;" id="vMeta"></div>
-        <div style="background:#f8fafc; padding:14px; border-radius:8px; white-space:pre-wrap; font-size:14px;" id="vContent"></div>
-        <div id="vReplyWrap"></div>
-        <div style="margin-top:16px; text-align:right;">
-          <button class="btn" style="background:#fee2e2; color:#b91c1c; padding:8px 14px; font-size:13px;" onclick="deleteMyPost()">게시글 삭제</button>
+      <div id="adminPostViewer" class="post-detail-card" style="display:none;">
+        <h4 id="apTitle" style="margin-bottom:6px;"></h4>
+        <div id="apMeta" style="font-size:13px; color:#64748b; margin-bottom:10px;"></div>
+        <div id="apContent" style="background:#fff; padding:12px; border-radius:6px; white-space:pre-wrap; font-size:14px; margin-bottom:12px;"></div>
+        <label style="font-size:13px; font-weight:700;">관리자 답변 작성</label>
+        <textarea id="apReplyInput" class="input" rows="3" style="margin:6px 0 10px;" placeholder="고객에게 안내할 견적 및 진행 안내를 입력하세요."></textarea>
+        <div style="display:flex; gap:8px;">
+          <button class="btn btn-primary" onclick="saveAdminReply()">💬 답변 등록/수정</button>
+          <button class="btn btn-danger" onclick="deleteAdminPost()">🗑️ 게시글 삭제</button>
         </div>
       </div>
     </div>
   </div>
-
-  <footer>
-    <p>주식회사 메모리친구 | 대표전화: 010-3247-9257 / 010-3421-4999 | 경기도 부천시 원미구 옥산로 251번길 51, 어주빌딩 2층</p>
-    <p style="margin-top:6px; font-size:12px;">© 2026 주식회사 메모리친구. All rights reserved.</p>
-  </footer>
 
 <script>
   const API_URL = "https://script.google.com/macros/s/AKfycbyr8PsSRiv5XBvcxMsyvVvxGmPoe2fnQccgRcFXGgysB2Pb7ijSJHzKuPKMHa7XzyVH/exec";
 
-  const MENU_CONFIG = {
-    'CPU': {
-      midTabs: [
-        {
-          name: 'INTEL',
-          subTabs: [
-            { name: '15/16세대', color: 't-orange' },
-            { name: '12/13/14세대', color: 't-orange' },
-            { name: '10/11세대', color: 't-orange' },
-            { name: '8/9세대', color: 't-pink' },
-            { name: '6/7세대', color: 't-purple' },
-            { name: '4세대', color: 't-blue' },
-            { name: '2/3세대', color: 't-green' },
-            { name: '1세대', color: 't-teal' }
-          ]
-        },
-        {
-          name: 'AMD',
-          subTabs: [
-            { name: 'AM5', color: 't-orange' },
-            { name: 'AM4', color: 't-pink' }
-          ]
-        }
-      ]
-    },
-    'BOARD': {
-      midTabs: [
-        {
-          name: '인텔',
-          subTabs: [
-            { name: '15/16세대', color: 't-orange' },
-            { name: '12/13/14세대', color: 't-orange' },
-            { name: '10/11세대', color: 't-orange' },
-            { name: '8/9세대', color: 't-pink' },
-            { name: '6/7세대', color: 't-purple' },
-            { name: '4세대', color: 't-blue' },
-            { name: '2/3세대', color: 't-green' }
-          ]
-        },
-        {
-          name: 'AMD',
-          subTabs: [
-            { name: 'AM5', color: 't-orange' },
-            { name: 'AM4', color: 't-pink' }
-          ]
-        }
-      ]
-    },
-    'RAM': {
-      midTabs: [
-        {
-          name: '데스크탑 메모리',
-          subTabs: [
-            { name: 'DDR5', color: 't-orange' },
-            { name: 'DDR4', color: 't-pink' },
-            { name: 'DDR3', color: 't-blue' }
-          ]
-        },
-        {
-          name: '노트북 메모리',
-          subTabs: [
-            { name: 'DDR5', color: 't-orange' },
-            { name: 'DDR4', color: 't-pink' },
-            { name: 'DDR3', color: 't-blue' }
-          ]
-        }
-      ]
-    },
-    'SSD': {
-      midTabs: [
-        {
-          name: '2.5형 / M.2',
-          subTabs: [
-            { name: '2.5형 SSD', color: 't-orange' },
-            { name: 'NVMe', color: 't-pink' },
-            { name: 'M.2', color: 't-blue' },
-            { name: 'M-SATA', color: 't-green' }
-          ]
-        }
-      ]
-    },
-    'HDD': {
-      midTabs: [
-        {
-          name: 'HDD',
-          subTabs: [
-            { name: '데스크탑용', color: 't-orange' },
-            { name: '노트북용', color: 't-blue' }
-          ]
-        }
-      ]
-    },
-    'VGA': {
-      midTabs: [
-        {
-          name: 'NVIDIA',
-          subTabs: [
-            { name: '5000시리즈', color: 't-orange' },
-            { name: '4000시리즈', color: 't-orange' },
-            { name: '3000시리즈', color: 't-pink' },
-            { name: '2000시리즈', color: 't-purple' },
-            { name: '1000시리즈', color: 't-blue' },
-            { name: '900시리즈', color: 't-green' },
-            { name: '700시리즈', color: 't-teal' },
-            { name: '600시리즈', color: 't-orange' },
-            { name: '500시리즈', color: 't-pink' },
-            { name: '400이하', color: 't-blue' }
-          ]
-        },
-        {
-          name: 'RADEON',
-          subTabs: [
-            { name: '9000시리즈', color: 't-orange' },
-            { name: '7000시리즈', color: 't-pink' },
-            { name: '6000시리즈', color: 't-purple' },
-            { name: '5000시리즈', color: 't-blue' },
-            { name: '500시리즈', color: 't-green' },
-            { name: '400시리즈', color: 't-teal' }
-          ]
-        }
-      ]
-    }
-  };
+  let savedPw = "";
+  let pricesCache = [];
+  let selectedPostId = null;
 
-  let allPrices = [];
-  let postList = [];
-  let currentTop = 'CPU';
-  let currentMidIdx = 0;
-  let currentSubIdx = 0;
-  let currentPostId = null;
-  let currentPostPw = null;
-
-  function showPage(pageId) {
-    document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
-    document.getElementById('sec-' + pageId).classList.add('active');
-    document.querySelectorAll('.nav-link').forEach(a => a.classList.toggle('active', a.dataset.target === pageId));
-    document.getElementById('navMenu').classList.remove('open');
-    window.scrollTo(0, 0);
-  }
-
-  function goPriceTab(catKey) {
-    showPage('prices');
-    const targetEl = document.querySelector(`.top-cat-item[data-cat="${catKey}"]`);
-    if (targetEl) selectTopCat(catKey, targetEl);
-  }
-
-  function openChannelTalk() {
-    if (window.ChannelIO) {
-      window.ChannelIO('showMessenger');
+  async function adminLogin() {
+    const pw = document.getElementById('adminPw').value.trim();
+    if (!pw) return alert("비밀번호를 입력하세요.");
+    const res = await fetch(`${API_URL}?action=checkAdmin&pw=${encodeURIComponent(pw)}`);
+    const data = await res.json();
+    if (data.status === "success") {
+      savedPw = pw;
+      document.getElementById('loginBox').style.display = 'none';
+      document.getElementById('adminPanel').style.display = 'block';
+      loadAdminData();
     } else {
-      openWriteModal('택배매입');
+      alert("비밀번호가 일치하지 않습니다.");
     }
   }
 
-  async function initData() {
-    try {
-      const res = await fetch(`${API_URL}?action=getAll`);
-      const data = await res.json();
-      if (data.status === "success") {
-        if (data.config.mainImage && !data.config.mainImage.includes("photo-1591799264318")) {
-          document.getElementById('heroMainImg').src = data.config.mainImage;
-        }
-        if (data.config.mainSub) {
-          document.getElementById('heroSub').innerText = data.config.mainSub;
-        }
-
-        allPrices = (data.prices || []).map(p => {
-          const parts = String(p.note || "").split("·").map(s => s.trim());
-          return {
-            ...p,
-            topCat: String(p.category || "").trim().toUpperCase(),
-            midCat: parts[0] || "",
-            subCat: parts[1] || "",
-            displayBadge: parts[2] || (parts[1] ? `[ ${parts[1]} ]` : `[ ${p.category} ]`)
-          };
-        });
-
-        renderMidTabs();
-
-        postList = data.posts || [];
-        renderBoard();
-      }
-    } catch (e) {
-      console.error(e);
-    }
+  function switchTab(name, btn) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
   }
 
-  function selectTopCat(catKey, el) {
-    currentTop = catKey;
-    currentMidIdx = 0;
-    currentSubIdx = 0;
-    document.getElementById('priceSearch').value = "";
-    document.querySelectorAll('.top-cat-item').forEach(item => item.classList.remove('active'));
-    el.classList.add('active');
-    renderMidTabs();
-  }
+  async function loadAdminData() {
+    const res = await fetch(`${API_URL}?action=getAll`);
+    const data = await res.json();
+    if (data.status !== "success") return;
 
-  function renderMidTabs() {
-    const midContainer = document.getElementById('midTabs');
-    const midList = MENU_CONFIG[currentTop].midTabs;
-    const totalSlots = Math.max(5, midList.length);
-    let html = '';
+    document.getElementById('cfgImgUrl').value = data.config.mainImage || "";
+    document.getElementById('imgPreview').src = data.config.mainImage || "";
+    document.getElementById('cfgTitle').value = data.config.mainTitle || "";
+    document.getElementById('cfgSub').value = data.config.mainSub || "";
+    document.getElementById('sheetUrlsInput').value = data.config.sheetUrls || "";
 
-    for (let i = 0; i < totalSlots; i++) {
-      if (i < midList.length) {
-        const activeClass = (i === currentMidIdx) ? 'active' : '';
-        html += `<div class="mid-tab-btn ${activeClass}" onclick="selectMidTab(${i})">${midList[i].name}</div>`;
-      } else {
-        html += `<div class="mid-tab-btn empty">&nbsp;</div>`;
-      }
-    }
-    midContainer.innerHTML = html;
-    renderSubTabs();
-  }
-
-  function selectMidTab(idx) {
-    currentMidIdx = idx;
-    currentSubIdx = 0;
-    document.getElementById('priceSearch').value = "";
-    renderMidTabs();
-  }
-
-  function renderSubTabs() {
-    const subContainer = document.getElementById('subTabs');
-    const subList = MENU_CONFIG[currentTop].midTabs[currentMidIdx].subTabs;
-    let html = `<span class="sub-tab-link ${currentSubIdx === -1 ? 'active' : ''}" style="color:#0f172a;" onclick="selectSubTab(-1)">전체</span><span class="sub-divider">|</span>`;
-
-    subList.forEach((sub, idx) => {
-      const activeClass = (idx === currentSubIdx) ? 'active' : '';
-      html += `<span class="sub-tab-link ${sub.color} ${activeClass}" onclick="selectSubTab(${idx})">${sub.name}</span>`;
-      if (idx < subList.length - 1) html += `<span class="sub-divider">|</span>`;
+    pricesCache = data.prices || [];
+    const cats = [...new Set(pricesCache.map(p => p.category))].filter(Boolean);
+    const catSel = document.getElementById('adminCatFilter');
+    catSel.innerHTML = '<option value="전체">전체 분류</option>';
+    cats.forEach(c => {
+      const opt = document.createElement('option');
+      opt.value = c; opt.innerText = c;
+      catSel.appendChild(opt);
     });
+    renderAdminPrices();
 
-    subContainer.innerHTML = html;
-    renderPriceTable();
-  }
-
-  function selectSubTab(idx) {
-    currentSubIdx = idx;
-    document.querySelectorAll('.sub-tab-link').forEach((link, i) => {
-      link.classList.toggle('active', (i - 1) === idx);
-    });
-    renderPriceTable();
-  }
-
-  function formatBadgeHtml(text) {
-    if (!text) return "";
-    if (text.includes('[')) {
-      return text.replace(/\[\s*(.*?)\s*\]/g, '[ <span class="highlight-gen">$1</span> ]');
-    }
-    return `[ <span class="highlight-gen">${text}</span> ]`;
-  }
-
-  function normalizeStr(s) {
-    return String(s || "").toLowerCase().replace(/\s+/g, "");
-  }
-
-  function renderPriceTable() {
-    const tbody = document.getElementById('priceTableBody');
-    const keyword = document.getElementById('priceSearch').value.trim().toLowerCase();
-
-    const midObj = MENU_CONFIG[currentTop].midTabs[currentMidIdx];
-    const targetMid = normalizeStr(midObj.name);
-    const targetSub = currentSubIdx >= 0 ? normalizeStr(midObj.subTabs[currentSubIdx].name) : "";
-
-    const filtered = allPrices.filter(p => {
-      const topMatch = (currentTop === 'RAM')
-        ? (p.topCat === 'RAM' || p.topCat === '램')
-        : (p.topCat === currentTop);
-      if (!topMatch) return false;
-
-      const pMid = normalizeStr(p.midCat);
-      const midMatch = !pMid || pMid === targetMid ||
-        ((targetMid === 'intel' || targetMid === '인텔') && (pMid === 'intel' || pMid === '인텔'));
-      if (!midMatch) return false;
-
-      if (currentSubIdx >= 0) {
-        const pSub = normalizeStr(p.subCat).replace(/[\[\]]/g, "");
-        const cleanBadge = normalizeStr(p.displayBadge).replace(/[\[\]]/g, "");
-        const itemSub = pSub || cleanBadge;
-        if (itemSub !== targetSub) return false;
-      }
-
-      if (keyword) {
-        const searchPool = `${p.name} ${p.note} ${p.displayBadge}`.toLowerCase();
-        if (!searchPool.includes(keyword)) return false;
-      }
-
-      return true;
-    });
-
-    if (!filtered.length) {
-      tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:36px; color:#64748b; font-weight:600;">해당 탭에 등록된 매입단가 데이터가 없습니다.</td></tr>';
-      return;
-    }
-
-    tbody.innerHTML = filtered.map(p => `
+    document.getElementById('adminBoardBody').innerHTML = (data.posts || []).map(p => `
       <tr>
-        <td class="td-p-cat">${formatBadgeHtml(p.displayBadge)}</td>
-        <td class="td-p-name">${p.name}</td>
-        <td class="td-p-val">${Number(p.price).toLocaleString('ko-KR')} 원</td>
-      </tr>
-    `).join('');
-  }
-
-  function renderBoard() {
-    const tbody = document.getElementById('boardTableBody');
-    if (!postList.length) {
-      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:30px; color:#94a3b8;">등록된 문의글이 없습니다.</td></tr>';
-      return;
-    }
-    tbody.innerHTML = postList.map(p => `
-      <tr class="post-row" onclick="openViewModal('${p.id}')">
-        <td><span class="badge">${p.method}</span></td>
-        <td>🔒 ${p.title}</td>
+        <td>${p.method}</td>
+        <td>${p.title}</td>
         <td>${p.author}</td>
-        <td style="color:#64748b;">${p.createdAt}</td>
-        <td><span class="status-pill ${p.hasReply ? 'st-done' : 'st-wait'}">${p.hasReply ? '답변완료' : '답변대기'}</span></td>
+        <td>${p.createdAt}</td>
+        <td>${p.hasReply ? '<span style="color:#15803d; font-weight:700;">답변완료</span>' : '<span style="color:#b45309;">대기중</span>'}</td>
+        <td><button class="btn btn-primary" style="padding:5px 10px; font-size:12px;" onclick="openAdminPost('${p.id}')">열람/답변</button></td>
       </tr>
     `).join('');
   }
 
-  function openWriteModal(defaultMethod) {
-    if (defaultMethod) document.getElementById('wMethod').value = defaultMethod;
-    document.getElementById('writeModal').classList.add('open');
+  function renderAdminPrices() {
+    const cat = document.getElementById('adminCatFilter').value;
+    const q = document.getElementById('adminPriceSearch').value.toLowerCase();
+    const filtered = pricesCache.filter(p =>
+      (cat === "전체" || p.category === cat) &&
+      (p.name.toLowerCase().includes(q) || (p.note || "").toLowerCase().includes(q))
+    );
+
+    document.getElementById('priceCount').innerText = filtered.length;
+    document.getElementById('adminPriceBody').innerHTML = filtered.map(p => `
+      <tr>
+        <td>${p.category}</td>
+        <td><strong>${p.name}</strong></td>
+        <td>${Number(p.price).toLocaleString()}원</td>
+        <td>${p.note || '-'}</td>
+        <td>
+          <button class="btn btn-gray" style="padding:5px 9px; font-size:12px;" onclick="editPrice('${p.id}')">수정</button>
+          <button class="btn btn-danger" style="padding:5px 9px; font-size:12px;" onclick="deletePrice('${p.id}')">삭제</button>
+        </td>
+      </tr>
+    `).join('');
   }
-  function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
-  async function submitPost() {
-    const method = document.getElementById('wMethod').value;
-    const title = document.getElementById('wTitle').value.trim();
-    const author = document.getElementById('wAuthor').value.trim();
-    const phone = document.getElementById('wPhone').value.trim();
-    const password = document.getElementById('wPassword').value.trim();
-    const content = document.getElementById('wContent').value.trim();
+  async function importFromSheetUrls() {
+    const rawUrlsText = document.getElementById('sheetUrlsInput').value.trim();
+    if (!rawUrlsText) return alert("구글 시트 탭 URL 또는 gid 번호를 1개 이상 입력해 주세요.");
+    const mode = document.getElementById('importMode').value;
 
-    if (!title || !author || !phone || !password || !content) return alert("모든 필수 항목을 입력해 주세요.");
-
-    const btn = document.getElementById('btnSubmitPost');
-    btn.disabled = true; btn.innerText = "등록 중...";
+    const btn = document.getElementById('btnImport');
+    btn.disabled = true;
+    btn.innerText = "시트에서 단가 불러오는 중...";
 
     try {
       const res = await fetch(API_URL, {
         method: "POST",
-        body: JSON.stringify({ action: "createPost", method, title, author, phone, password, content })
+        body: JSON.stringify({
+          action: "importFromSheets",
+          pw: savedPw,
+          rawUrlsText,
+          mode
+        })
       });
       const r = await res.json();
       if (r.status === "success") {
-        alert("매입 문의가 등록되었습니다.");
-        closeModal('writeModal');
-        ['wTitle','wAuthor','wPhone','wPassword','wContent'].forEach(id => document.getElementById(id).value = "");
-        showPage('board');
-        location.reload();
+        alert(`✅ 총 ${r.count}개 품목의 매입단가를 성공적으로 불러왔습니다!`);
+        loadAdminData();
+      } else {
+        alert("가져오기 실패: " + r.message);
       }
     } catch (e) {
-      alert("등록 중 오류가 발생했습니다.");
+      alert("통신 오류가 발생했습니다. 입력 내용을 확인해 주세요.");
     } finally {
-      btn.disabled = false; btn.innerText = "비밀글 등록하기";
+      btn.disabled = false;
+      btn.innerText = "🚀 시트 단가 불러오기";
     }
   }
 
-  function openViewModal(id) {
-    currentPostId = id;
-    currentPostPw = null;
-    document.getElementById('vModalTitle').innerText = "🔒 비밀글 확인";
-    document.getElementById('pwCheckArea').style.display = "block";
-    document.getElementById('postDetailArea').style.display = "none";
-    document.getElementById('vPasswordInput').value = "";
-    document.getElementById('viewModal').classList.add('open');
+  // 구글 시트 1셀 최대 용량(50,000자) 이내로 자동 압축 변환
+  function handleImageUpload(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let maxW = 700;
+        let quality = 0.65;
+        let dataUrl = "";
+
+        do {
+          const scale = Math.min(1, maxW / img.width);
+          canvas.width = Math.round(img.width * scale);
+          canvas.height = Math.round(img.height * scale);
+          const ctx = canvas.getContext('2d');
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          dataUrl = canvas.toDataURL('image/jpeg', quality);
+          if (dataUrl.length <= 45000) break;
+          quality -= 0.1;
+          if (quality < 0.3) {
+            maxW = Math.round(maxW * 0.8);
+            quality = 0.5;
+          }
+        } while (maxW >= 200);
+
+        document.getElementById('cfgImgUrl').value = dataUrl;
+        document.getElementById('imgPreview').src = dataUrl;
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
   }
 
-  async function verifyAndRead() {
-    const pw = document.getElementById('vPasswordInput').value.trim();
-    if (!pw) return alert("비밀번호를 입력하세요.");
+  async function saveBannerConfig() {
+    const mainImage = document.getElementById('cfgImgUrl').value.trim();
+    const mainTitle = document.getElementById('cfgTitle').value.trim();
+    const mainSub = document.getElementById('cfgSub').value.trim();
 
-    const res = await fetch(`${API_URL}?action=getPostDetail&id=${currentPostId}&pw=${encodeURIComponent(pw)}`);
-    const data = await res.json();
-    if (data.status === "success") {
-      currentPostPw = pw;
-      const p = data.post;
-      document.getElementById('vModalTitle').innerText = p.title;
-      document.getElementById('vMeta').innerText = `방식: ${p.method} | 작성자: ${p.author} (${p.phone}) | 작성일: ${p.createdAt}`;
-      document.getElementById('vContent').innerText = p.content;
-      document.getElementById('vReplyWrap').innerHTML = p.reply
-        ? `<div class="reply-box"><strong>💬 담당자 답변</strong><br><div style="margin-top:6px; white-space:pre-wrap;">${p.reply}</div></div>`
-        : `<div style="margin-top:14px; font-size:13px; color:#94a3b8;">아직 담당자 답변이 등록되지 않았습니다.</div>`;
-      document.getElementById('pwCheckArea').style.display = "none";
-      document.getElementById('postDetailArea').style.display = "block";
-    } else {
-      alert(data.message);
+    if (mainImage.length > 49000) {
+      return alert("이미지 용량이 너무 큽니다. 더 작은 이미지를 선택하거나 외부 이미지 URL을 입력해 주세요.");
+    }
+
+    const btn = document.getElementById('btnSaveBanner');
+    btn.disabled = true;
+    btn.innerText = "저장 중...";
+
+    try {
+      const res = await fetch(API_URL, {
+        method: "POST",
+        body: JSON.stringify({ action: "saveConfig", pw: savedPw, mainImage, mainTitle, mainSub })
+      });
+      const r = await res.json();
+      alert(r.status === "success" ? "메인 배너가 저장되었습니다." : ("저장 실패: " + (r.message || "오류 발생")));
+    } catch (e) {
+      alert("저장 중 통신 오류가 발생했습니다.");
+    } finally {
+      btn.disabled = false;
+      btn.innerText = "💾 메인 설정 저장하기";
     }
   }
 
-  async function deleteMyPost() {
-    if (!confirm("정말 이 문의글을 삭제하시겠습니까?")) return;
+  function editPrice(id) {
+    const p = pricesCache.find(item => String(item.id) === String(id));
+    if (!p) return;
+    document.getElementById('editPriceId').value = p.id;
+    document.getElementById('pCat').value = p.category;
+    document.getElementById('pName').value = p.name;
+    document.getElementById('pVal').value = p.price;
+    document.getElementById('pNote').value = p.note;
+    document.getElementById('pName').focus();
+  }
+
+  function clearPriceForm() {
+    ['editPriceId','pCat','pName','pVal','pNote'].forEach(id => document.getElementById(id).value = "");
+  }
+
+  async function savePriceItem() {
+    const id = document.getElementById('editPriceId').value;
+    const category = document.getElementById('pCat').value.trim();
+    const name = document.getElementById('pName').value.trim();
+    const price = document.getElementById('pVal').value;
+    const note = document.getElementById('pNote').value.trim();
+    if (!category || !name || !price) return alert("분류, 상품명, 단가는 필수입니다.");
+
     const res = await fetch(API_URL, {
       method: "POST",
-      body: JSON.stringify({ action: "deletePostUser", id: currentPostId, pw: currentPostPw })
+      body: JSON.stringify({ action: "savePrice", pw: savedPw, id, category, name, price, note })
     });
     const r = await res.json();
     if (r.status === "success") {
-      alert("삭제되었습니다.");
-      location.reload();
-    } else {
-      alert(r.message);
+      clearPriceForm();
+      loadAdminData();
     }
   }
 
-  initData();
-</script>
+  async function deletePrice(id) {
+    if (!confirm("해당 단가 항목을 삭제하시겠습니까?")) return;
+    await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "deletePrice", pw: savedPw, id }) });
+    loadAdminData();
+  }
 
-<!-- 채널톡 실시간 채팅 상담 스크립트 -->
-<script>
-  (function(){var w=window;if(w.ChannelIO){return w.console.error("ChannelIO script included twice.");}var ch=function(){ch.c(arguments);};ch.q=[];ch.c=function(args){ch.q.push(args);};w.ChannelIO=ch;function l(){if(w.ChannelIOInitialized){return;}w.ChannelIOInitialized=true;var s=document.createElement("script");s.type="text/javascript";s.async=true;s.src="https://cdn.channel.io/plugin/ch-plugin-web.js";var x=document.getElementsByTagName("script")[0];if(x.parentNode){x.parentNode.insertBefore(s,x);}}if(document.readyState==="complete"){l();}else{w.addEventListener("DOMContentLoaded",l);w.addEventListener("load",l);}})();
+  async function openAdminPost(id) {
+    selectedPostId = id;
+    const res = await fetch(`${API_URL}?action=getPostDetail&id=${id}&pw=${encodeURIComponent(savedPw)}`);
+    const data = await res.json();
+    if (data.status === "success") {
+      const p = data.post;
+      document.getElementById('apTitle').innerText = `[${p.method}] ${p.title}`;
+      document.getElementById('apMeta').innerText = `작성자: ${p.author} | 연락처: ${p.phone} | 작성일: ${p.createdAt}`;
+      document.getElementById('apContent').innerText = p.content;
+      document.getElementById('apReplyInput').value = p.reply || "";
+      document.getElementById('adminPostViewer').style.display = 'block';
+    }
+  }
 
-  ChannelIO('boot', {
-    "pluginKey": "89ef2c51-8fa8-414f-aed6-a3ee3c7a4320"
-  });
+  async function saveAdminReply() {
+    const reply = document.getElementById('apReplyInput').value.trim();
+    const res = await fetch(API_URL, {
+      method: "POST",
+      body: JSON.stringify({ action: "replyPost", pw: savedPw, id: selectedPostId, reply })
+    });
+    const r = await res.json();
+    if (r.status === "success") {
+      alert("답변이 저장되었습니다.");
+      loadAdminData();
+    }
+  }
+
+  async function deleteAdminPost() {
+    if (!confirm("관리자 권한으로 이 게시글을 삭제하시겠습니까?")) return;
+    await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "deletePostAdmin", pw: savedPw, id: selectedPostId }) });
+    document.getElementById('adminPostViewer').style.display = 'none';
+    loadAdminData();
+  }
 </script>
 </body>
 </html>
